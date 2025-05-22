@@ -7,8 +7,10 @@
 
 #ifdef _USE_MPI
 #include <mpi.h>
-
+#include <vector>
+#include <map>
 #include <cassert>
+#include <iostream>
 
 #include "cppsim/exception.hpp"
 #include "type.hpp"
@@ -27,6 +29,8 @@ private:
     MPI_Request mpireq[_MAX_REQUESTS];
     UINT mpireq_idx = 0;
     UINT mpireq_cnt = 0;
+    double comm_time = 0.0;
+    double sync_time = 0.0;
 
     static void MPIFunctionError(
         const std::string &func, UINT ret, const std::string &file, UINT line);
@@ -56,6 +60,7 @@ public:
     }
 
     MPI_Request *get_request();
+    std::map<std::string, std::vector<double>> get_sim_info();
     int get_rank();
     int get_size();
     int get_tag();

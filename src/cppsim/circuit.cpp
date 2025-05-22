@@ -31,6 +31,15 @@ void QuantumCircuit::update_quantum_state(QuantumStateBase* state) {
     for (const auto& gate : this->_gate_list) {
         gate->update_quantum_state(state);
     }
+
+#ifdef _USE_MPI
+    MPIutil& mpiutil = MPIutil::get_inst();
+    UINT mpirank = mpiutil.get_rank();
+    if (mpirank == 0) {
+        std::cout << "===== Output Distributed Simulation Info =====" << std::endl;
+    }
+    auto info = mpiutil.get_sim_info();
+#endif
 }
 
 void QuantumCircuit::update_quantum_state(QuantumStateBase* state, UINT seed) {
