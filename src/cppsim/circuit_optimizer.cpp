@@ -173,6 +173,7 @@ void QuantumCircuitOptimizer::optimize_light(
     set_qubit_count();
 
     insert_swap_gates(swap_level);
+    return;
 
     UINT qubit_count = circuit->qubit_count;
     std::vector<std::pair<int, std::vector<UINT>>> current_step(
@@ -873,6 +874,7 @@ void QuantumCircuitOptimizer::insert_swap_gates(const UINT level) {
 
     t_begin_swapadd = std::chrono::system_clock::now();
     UINT num_gates = circuit->gate_list.size();
+    UINT num_inserted = 0;
     QubitTable qt(circuit->qubit_count);
 
     GateReplacer replacer;
@@ -893,6 +895,7 @@ void QuantumCircuitOptimizer::insert_swap_gates(const UINT level) {
                 rearrange_qubits(gate_idx, next_local_qubit, qt);
             gate_idx += num_inserted_gates;
             num_gates += num_inserted_gates;
+            num_inserted += num_inserted_gates;
         }
         LOG << "rewrite_gate_qubit_indexes #" << gate_idx << std::endl;
         auto g = circuit->gate_list[gate_idx];
@@ -927,4 +930,8 @@ void QuantumCircuitOptimizer::insert_swap_gates(const UINT level) {
 
     LOG << "time for dep_analysis [s] " << t_depanalysis << std::endl;
     LOG << "time for swap_add [s] " << t_swapadd << std::endl;
+
+    if (mpirank == 0) {
+        std::cout << "[INFO] #inserted gates: " << num_inserted << std::endl;
+    }
 }
